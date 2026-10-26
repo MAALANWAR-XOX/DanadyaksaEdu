@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DanadyaksaEdu - Portal Edukasi Terpadu</title>
+  <title>DanadyaksaEdu - Portal Edukasi Terpadu (Realtime Sync)</title>
   <!-- FAVICON YPI -->
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -35,6 +35,11 @@
   <!-- Google Fonts & FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDKs (Compatibility Version) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -221,6 +226,10 @@
       </button>
       <div class="hidden sm:flex items-center space-x-2 text-xs text-slate-600 dark:text-slate-400">
         <i class="fa-solid text-emerald-600 dark:text-cyan-400"></i>
+        <!-- Realtime Status Indicator -->
+        <span id="firebase-sync-status" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-600 border border-amber-500/30 flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span> Connecting Realtime...
+        </span>
       </div>
       <div class="flex items-center space-x-2 sm:space-x-3 ml-auto">
         <button onclick="toggleDarkMode()" title="Ubah Mode Tampilan" class="p-2 sm:p-2.5 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-cyan-400 bg-emerald-500/10 dark:bg-slate-800/60 hover:bg-emerald-500/20 dark:hover:bg-slate-800 rounded-full transition-all duration-200 flex items-center justify-center focus:outline-none">
@@ -348,12 +357,11 @@
             </div>
           </div>
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <!-- MENU 1: TOTAL MODUL -->
             <div onclick="switchTab('modul')" class="glass-card p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-emerald-500/20 dark:border-slate-800/80 hover:border-cyan-500/40 transition-all cursor-pointer group">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">Total Modul</p>
-                  <p id="dash-stat-modul-count" class="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white mt-1">4 Unit</p>
+                  <p id="dash-stat-modul-count" class="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white mt-1">0 Unit</p>
                 </div>
                 <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center text-sm sm:text-lg group-hover:scale-110 transition-transform shrink-0">
                   <i class="fa-solid fa-book-open"></i>
@@ -364,7 +372,6 @@
                 <i class="fa-solid fa-arrow-right text-[9px]"></i>
               </div>
             </div>
-            <!-- MENU 2: TUGAS & PROYEK -->
             <div onclick="switchTab('tugas')" class="glass-card p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-emerald-500/20 dark:border-slate-800/80 hover:border-teal-500/40 transition-all cursor-pointer group">
               <div class="flex items-center justify-between">
                 <div>
@@ -380,7 +387,6 @@
                 <i class="fa-solid fa-arrow-right text-[9px]"></i>
               </div>
             </div>
-            <!-- MENU 3: RATA-RATA NILAI KUIS -->
             <div onclick="switchTab('nilai')" class="glass-card p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-emerald-500/20 dark:border-slate-800/80 hover:border-emerald-500/40 transition-all cursor-pointer group">
               <div class="flex items-center justify-between">
                 <div>
@@ -396,12 +402,11 @@
                 <i class="fa-solid fa-arrow-right text-[9px]"></i>
               </div>
             </div>
-            <!-- MENU 4: AKTIVITAS -->
             <div onclick="openActivityModal()" class="glass-card p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-emerald-500/20 dark:border-slate-800/80 hover:border-amber-500/40 transition-all cursor-pointer group">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">Aktivitas</p>
-                  <p class="text-lg sm:text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">96%</p>
+                  <p class="text-lg sm:text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">Live</p>
                 </div>
                 <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-sm sm:text-lg group-hover:scale-110 transition-transform shrink-0">
                   <i class="fa-solid fa-user-check"></i>
@@ -665,7 +670,6 @@
                   </button>
                 </form>
               </div>
-
               <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-emerald-500/30 shadow-xl">
                 <div class="flex items-center space-x-3 mb-4 sm:mb-5 pb-3 border-b border-emerald-500/20">
                   <div class="p-2 sm:p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
@@ -696,7 +700,6 @@
                 </form>
               </div>
             </div>
-
             <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-cyan-500/20 shadow-xl">
               <div class="flex items-center justify-between mb-4 pb-3 border-b border-cyan-500/20">
                 <div class="flex items-center space-x-3">
@@ -760,7 +763,7 @@
               </div>
               <div id="teacher-submissions-list" class="space-y-3"></div>
             </div>
-
+            
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
               <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-indigo-500/30 shadow-xl">
                 <div class="flex items-center space-x-3 mb-4 sm:mb-5 pb-3 border-b border-indigo-500/20">
@@ -803,7 +806,6 @@
                 </form>
                 <div class="mt-4 sm:mt-6 border-t border-indigo-500/20 pt-4 space-y-2.5" id="announcement-manage-list"></div>
               </div>
-
               <div class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-emerald-500/30 shadow-xl">
                 <div class="flex items-center space-x-3 mb-4 sm:mb-5 pb-3 border-b border-emerald-500/20">
                   <div class="p-2 sm:p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
@@ -1054,8 +1056,28 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- JAVASCRIPT LOGIC WITH FIREBASE SYNC -->
   <script>
+    // -------------------------------------------------------------------
+    // 1. FIREBASE CONFIGURATION (Ganti kredensial di bawah dari Firebase Console Anda)
+    // -------------------------------------------------------------------
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    // Default Seed Data bila Database Kosong
     const DEFAULT_ACCOUNTS = [
       { name: "Muhammad Hilman Fasya, S.Pd.", id: "hilmanfasya90@gmail.com", pass: "Fasya1995", role: "guru", status: "Aktif", grade: "Kelas 12 (Dua Belas)", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Guru" },
       { name: "Aira Farsya Anggreani Putri", id: "0109271505", pass: "siswa123", role: "siswa", status: "Aktif", grade: "Kelas 12 (Dua Belas)", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Siswa" },
@@ -1113,48 +1135,6 @@
             correct: 2
           }
         ]
-      },
-      {
-        id: "mod-3",
-        title: "Keamanan Siber & Enkripsi Data",
-        desc: "Konsep Kriptografi, Hashing, SSL/TLS, Cyber Hygiene, dan Pencegahan Serangan Cyber.",
-        badge: "Modul 3",
-        icon: "fa-user-shield",
-        color: "emerald",
-        content: `
-          <h3 class="text-lg sm:text-xl font-bold text-emerald-700 dark:text-emerald-400 mb-2">1. Prinsip Dasar Keamanan Siber (CIA Triad)</h3>
-          <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
-            Tiga pilar utama keamanan informasi adalah Confidentiality (Kerahasiaan), Integrity (Integritas), dan Availability (Ketersediaan).
-          </p>
-        `,
-        quizQuestions: [
-          {
-            question: "Pilar CIA Triad yang menjamin data tidak diubah oleh pihak yang tidak berwenang adalah...",
-            options: ["Confidentiality", "Integrity", "Availability", "Authentication"],
-            correct: 1
-          }
-        ]
-      },
-      {
-        id: "mod-4",
-        title: "Kecerdasan Buatan (AI) & Machine Learning",
-        desc: "Pengenalan Algoritma ML, Supervised Learning, Deep Learning, dan Etika AI.",
-        badge: "Modul 4",
-        icon: "fa-brain",
-        color: "amber",
-        content: `
-          <h3 class="text-lg sm:text-xl font-bold text-amber-700 dark:text-amber-400 mb-2">1. Pengenalan Machine Learning</h3>
-          <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
-            Machine learning memungkinkan komputer belajar dari data secara mandiri tanpa harus diprogram ulang secara eksplisit.
-          </p>
-        `,
-        quizQuestions: [
-          {
-            question: "Jenis pembelajaraan mesin yang dilatih menggunakan data yang sudah berlabel (labeled data) adalah...",
-            options: ["Unsupervised Learning", "Supervised Learning", "Reinforcement Learning", "Deep Q-Learning"],
-            correct: 1
-          }
-        ]
       }
     ];
     const DEFAULT_ANNOUNCEMENTS = [
@@ -1164,13 +1144,6 @@
         date: "18 Okt 2026",
         title: "Pengumpulan Proyek UI/UX Aplikasi Edukasi",
         desc: "Pastikan melampirkan link Figma dan prototype interaktif sebelum hari Jumat pkl 23.59 WIB."
-      },
-      {
-        id: "ann-2",
-        category: "Ujian Kuis",
-        date: "15 Okt 2026",
-        title: "Kuis Keamanan Siber & Enkripsi Data",
-        desc: "Kuis modul Cybersecurity sudah dibuka. Akses pada menu Modul untuk memulai latihan mandiri."
       }
     ];
     const DEFAULT_SCHEDULES = [
@@ -1179,19 +1152,13 @@
         time: "Senin, 08:00 WIB",
         subject: "Object Oriented Programming (OOP)",
         room: "Lab 1"
-      },
-      {
-        id: "sch-2",
-        time: "Rabu, 10:15 WIB",
-        subject: "Prinsip UI/UX & Design Thinking",
-        room: "Ruang Kelas"
       }
     ];
     const DEFAULT_ASSIGNMENTS = [
-      { id: "t1", title: "Proyek UI/UX Figma - Aplikasi Sekolah", due: "25 Oktober 2026" },
-      { id: "t2", title: "Praktikum Class & Inheritance Java", due: "18 Oktober 2026" },
-      { id: "t3", title: "Analisis Algoritma Enkripsi AES", due: "10 Oktober 2026" }
+      { id: "t1", title: "Proyek UI/UX Figma - Aplikasi Sekolah", due: "25 Oktober 2026" }
     ];
+
+    // Global State
     let accounts = [];
     let courseModules = [];
     let announcements = [];
@@ -1209,84 +1176,135 @@
       userAnswers: {}
     };
 
+    // -------------------------------------------------------------------
+    // 2. REALTIME LISTENERS & SYNC ENGINE
+    // -------------------------------------------------------------------
     window.onload = function() {
-      initStorage();
       initTheme();
-      renderModules();
-      renderManageModulesList();
-      renderAssignments();
-      renderAnnouncementsAndSchedules();
-      populateModuleDropdown();
-      populateLeaderboardFilter();
-      checkSession();
+      initRealtimeSync();
     };
 
-    function initStorage() {
-      const stored = localStorage.getItem('inf12_accounts');
-      if (!stored) {
-        DEFAULT_ACCOUNTS.forEach(acc => {
-          if(!acc.avatar) acc.avatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(acc.name)}`;
-          if(!acc.grade) acc.grade = "Kelas 12 (Dua Belas)";
-        });
-        localStorage.setItem('inf12_accounts', JSON.stringify(DEFAULT_ACCOUNTS));
-        accounts = DEFAULT_ACCOUNTS;
-      } else {
-        accounts = JSON.parse(stored);
-        accounts.forEach(acc => {
-          if (!acc.avatar) acc.avatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(acc.name)}`;
-          if (!acc.grade) acc.grade = "Kelas 12 (Dua Belas)";
-        });
-      }
-      const storedModules = localStorage.getItem('inf12_modules');
-      if (!storedModules) {
-        localStorage.setItem('inf12_modules', JSON.stringify(DEFAULT_MODULES));
-        courseModules = DEFAULT_MODULES;
-      } else {
-        courseModules = JSON.parse(storedModules);
-        courseModules.forEach(m => {
-          if (!m.quizQuestions) {
-            m.quizQuestions = [];
-            if (m.quiz && m.quiz.question) {
-              m.quizQuestions.push(m.quiz);
-            }
+    function initRealtimeSync() {
+      const syncStatus = document.getElementById('firebase-sync-status');
+      
+      // Monitor status koneksi ke Firebase
+      db.ref('.info/connected').on('value', (snap) => {
+        if (snap.val() === true) {
+          if (syncStatus) {
+            syncStatus.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1";
+            syncStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Realtime Active`;
           }
-        });
-      }
-      const storedAnn = localStorage.getItem('inf12_announcements');
-      if (!storedAnn) {
-        localStorage.setItem('inf12_announcements', JSON.stringify(DEFAULT_ANNOUNCEMENTS));
-        announcements = DEFAULT_ANNOUNCEMENTS;
-      } else {
-        announcements = JSON.parse(storedAnn);
-      }
-      const storedSch = localStorage.getItem('inf12_schedules');
-      if (!storedSch) {
-        localStorage.setItem('inf12_schedules', JSON.stringify(DEFAULT_SCHEDULES));
-        schedules = DEFAULT_SCHEDULES;
-      } else {
-        schedules = JSON.parse(storedSch);
-      }
-      const storedAssign = localStorage.getItem('inf12_assignments');
-      if (!storedAssign) {
-        localStorage.setItem('inf12_assignments', JSON.stringify(DEFAULT_ASSIGNMENTS));
-        assignments = DEFAULT_ASSIGNMENTS;
-      } else {
-        assignments = JSON.parse(storedAssign);
-      }
-      const storedSubmissions = localStorage.getItem('inf12_task_submissions');
-      if (storedSubmissions) {
-        taskSubmissions = JSON.parse(storedSubmissions);
-      } else {
-        taskSubmissions = [];
-      }
-      const storedQuizResults = localStorage.getItem('inf12_quiz_results');
-      if (storedQuizResults) {
-        quizResults = JSON.parse(storedQuizResults);
-      } else {
-        quizResults = [];
-      }
+        } else {
+          if (syncStatus) {
+            syncStatus.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-1";
+            syncStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Disconnected`;
+          }
+        }
+      });
+
+      // Bind Listeners
+      db.ref('danadyaksa/accounts').on('value', (snapshot) => {
+        const val = snapshot.val();
+        if (!val) {
+          db.ref('danadyaksa/accounts').set(DEFAULT_ACCOUNTS);
+          accounts = DEFAULT_ACCOUNTS;
+        } else {
+          accounts = Array.isArray(val) ? val : Object.values(val);
+        }
+        if (currentUser) {
+          const found = accounts.find(a => a.id === currentUser.id);
+          if (found) currentUser = found;
+          if (currentUser.role === 'guru') {
+            renderStudentTable();
+            renderTeacherLeaderboard();
+          }
+        }
+      });
+
+      db.ref('danadyaksa/modules').on('value', (snapshot) => {
+        const val = snapshot.val();
+        if (!val) {
+          db.ref('danadyaksa/modules').set(DEFAULT_MODULES);
+          courseModules = DEFAULT_MODULES;
+        } else {
+          courseModules = Array.isArray(val) ? val : Object.values(val);
+        }
+        renderModules();
+        renderManageModulesList();
+        populateModuleDropdown();
+        populateLeaderboardFilter();
+      });
+
+      db.ref('danadyaksa/announcements').on('value', (snapshot) => {
+        const val = snapshot.val();
+        if (!val) {
+          db.ref('danadyaksa/announcements').set(DEFAULT_ANNOUNCEMENTS);
+          announcements = DEFAULT_ANNOUNCEMENTS;
+        } else {
+          announcements = Array.isArray(val) ? val : Object.values(val);
+        }
+        renderAnnouncementsAndSchedules();
+      });
+
+      db.ref('danadyaksa/schedules').on('value', (snapshot) => {
+        const val = snapshot.val();
+        if (!val) {
+          db.ref('danadyaksa/schedules').set(DEFAULT_SCHEDULES);
+          schedules = DEFAULT_SCHEDULES;
+        } else {
+          schedules = Array.isArray(val) ? val : Object.values(val);
+        }
+        renderAnnouncementsAndSchedules();
+      });
+
+      db.ref('danadyaksa/assignments').on('value', (snapshot) => {
+        const val = snapshot.val();
+        if (!val) {
+          db.ref('danadyaksa/assignments').set(DEFAULT_ASSIGNMENTS);
+          assignments = DEFAULT_ASSIGNMENTS;
+        } else {
+          assignments = Array.isArray(val) ? val : Object.values(val);
+        }
+        renderAssignments();
+        renderManageTaskContainer();
+        updateDashboardTaskStats();
+      });
+
+      db.ref('danadyaksa/taskSubmissions').on('value', (snapshot) => {
+        const val = snapshot.val();
+        taskSubmissions = val ? (Array.isArray(val) ? val : Object.values(val)) : [];
+        renderAssignments();
+        updateDashboardTaskStats();
+        if (currentUser && currentUser.role === 'guru') {
+          renderTeacherSubmissions();
+        }
+      });
+
+      db.ref('danadyaksa/quizResults').on('value', (snapshot) => {
+        const val = snapshot.val();
+        quizResults = val ? (Array.isArray(val) ? val : Object.values(val)) : [];
+        updateUserDashboardQuizStats();
+        renderStudentQuizHistory();
+        if (currentUser && currentUser.role === 'guru') {
+          renderTeacherLeaderboard();
+          renderTeacherQuizResultsTable();
+        }
+      });
+
+      checkSession();
     }
 
+    // Helper Fungsi untuk Simpan Data ke Firebase
+    function saveToFirebase(path, data) {
+      db.ref(`danadyaksa/${path}`).set(data).catch(err => {
+        console.error("Firebase Sync Error:", err);
+        showToast("Gagal menyimpan perubahan ke server Realtime", "error");
+      });
+    }
+
+    // -------------------------------------------------------------------
+    // 3. UI & SYSTEM FUNCTIONS
+    // -------------------------------------------------------------------
     function toggleDarkMode() {
       const htmlEl = document.documentElement;
       const themeIcon = document.getElementById('theme-icon');
@@ -1328,8 +1346,6 @@
       const savedUser = localStorage.getItem('inf12_current_user');
       if (savedUser) {
         currentUser = JSON.parse(savedUser);
-        const found = accounts.find(a => a.id === currentUser.id);
-        if (found) currentUser = found;
         setupLoggedInState();
       } else {
         setupLoggedOutState();
@@ -1420,7 +1436,7 @@
         avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(name)}`
       };
       accounts.push(newUser);
-      localStorage.setItem('inf12_accounts', JSON.stringify(accounts));
+      saveToFirebase('accounts', accounts);
       currentUser = newUser;
       localStorage.setItem('inf12_current_user', JSON.stringify(currentUser));
       showToast("Pendaftaran akun berhasil!", "success");
@@ -1540,7 +1556,7 @@
       
       let html = '';
       html += `<div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-slate-800 dark:text-slate-200">
-        <p class="font-bold">Status: <span class="text-emerald-600 dark:text-emerald-400">Aktif</span></p>
+        <p class="font-bold">Status: <span class="text-emerald-600 dark:text-emerald-400">Aktif Realtime</span></p>
         <p class="text-[10px] text-slate-500 mt-0.5">${currentUser.role.toUpperCase()} | ${currentUser.id}</p>
       </div>`;
       
@@ -1615,7 +1631,8 @@
       const tbody = document.getElementById('leaderboard-table-body');
       if (!tbody) return;
       
-      const selectedMod = document.getElementById('leaderboard-module-filter').value;
+      const filterEl = document.getElementById('leaderboard-module-filter');
+      const selectedMod = filterEl ? filterEl.value : 'ALL';
       const students = accounts.filter(a => a.role === 'siswa');
       
       if (students.length === 0) {
@@ -1894,7 +1911,7 @@
         currentUser.avatar = tempAvatarBase64;
         accounts.push(currentUser);
       }
-      localStorage.setItem('inf12_accounts', JSON.stringify(accounts));
+      saveToFirebase('accounts', accounts);
       localStorage.setItem('inf12_current_user', JSON.stringify(currentUser));
       setupLoggedInState();
       showToast("Profil diperbarui!", "success");
@@ -2011,11 +2028,8 @@
         assignments.push(newTask);
         showToast("Tugas baru ditambahkan!", "success");
       }
-      localStorage.setItem('inf12_assignments', JSON.stringify(assignments));
+      saveToFirebase('assignments', assignments);
       resetTaskForm();
-      renderAssignments();
-      renderManageTaskContainer();
-      updateDashboardTaskStats();
     }
 
     function editTask(id) {
@@ -2029,10 +2043,7 @@
 
     function deleteTask(id) {
       assignments = assignments.filter(t => t.id !== id);
-      localStorage.setItem('inf12_assignments', JSON.stringify(assignments));
-      renderAssignments();
-      renderManageTaskContainer();
-      updateDashboardTaskStats();
+      saveToFirebase('assignments', assignments);
       showToast("Tugas dihapus.", "warning");
     }
 
@@ -2090,9 +2101,7 @@
         }
         sub.score = scoreNum;
         sub.status = "Dinilai";
-        localStorage.setItem('inf12_task_submissions', JSON.stringify(taskSubmissions));
-        renderTeacherSubmissions();
-        renderAssignments();
+        saveToFirebase('taskSubmissions', taskSubmissions);
         showToast(`Nilai ${scoreNum} disimpan!`, "success");
       }
     }
@@ -2118,9 +2127,8 @@
         announcements.unshift(newAnn);
         showToast("Pengumuman dipublikasikan!", "success");
       }
-      localStorage.setItem('inf12_announcements', JSON.stringify(announcements));
+      saveToFirebase('announcements', announcements);
       resetAnnForm();
-      renderAnnouncementsAndSchedules();
     }
 
     function editAnnouncement(id) {
@@ -2136,8 +2144,7 @@
 
     function deleteAnnouncement(id) {
       announcements = announcements.filter(a => a.id !== id);
-      localStorage.setItem('inf12_announcements', JSON.stringify(announcements));
-      renderAnnouncementsAndSchedules();
+      saveToFirebase('announcements', announcements);
       showToast("Pengumuman dihapus.", "warning");
     }
 
@@ -2170,9 +2177,8 @@
         schedules.push(newSch);
         showToast("Jadwal ditambahkan!", "success");
       }
-      localStorage.setItem('inf12_schedules', JSON.stringify(schedules));
+      saveToFirebase('schedules', schedules);
       resetSchForm();
-      renderAnnouncementsAndSchedules();
     }
 
     function editSchedule(id) {
@@ -2187,8 +2193,7 @@
 
     function deleteSchedule(id) {
       schedules = schedules.filter(s => s.id !== id);
-      localStorage.setItem('inf12_schedules', JSON.stringify(schedules));
-      renderAnnouncementsAndSchedules();
+      saveToFirebase('schedules', schedules);
       showToast("Jadwal dihapus.", "warning");
     }
 
@@ -2399,7 +2404,7 @@
       };
       
       quizResults.unshift(newRecord);
-      localStorage.setItem('inf12_quiz_results', JSON.stringify(quizResults));
+      saveToFirebase('quizResults', quizResults);
       
       const resultDiv = document.getElementById('quiz-final-result');
       if (resultDiv) {
@@ -2408,14 +2413,8 @@
           <div class="text-xs sm:text-sm font-black mb-1 flex items-center">
             <i class="fa-solid fa-award text-base mr-1.5"></i> Skor Kuis: ${score} / 100
           </div>
-          <p class="font-normal text-[10px] sm:text-[11px]">Jawaban benar ${correctCount} dari ${questions.length} soal. Nilai tersimpan!</p>
+          <p class="font-normal text-[10px] sm:text-[11px]">Jawaban benar ${correctCount} dari ${questions.length} soal. Nilai tersimpan ke Cloud!</p>
         `;
-      }
-      updateUserDashboardQuizStats();
-      renderStudentQuizHistory();
-      if (currentUser.role === 'guru') {
-        renderTeacherLeaderboard();
-        renderTeacherQuizResultsTable();
       }
       
       showToast(`Kuis selesai! Skor: ${score}`, "success");
@@ -2507,14 +2506,9 @@
       } else {
         taskSubmissions.unshift(subData);
       }
-      localStorage.setItem('inf12_task_submissions', JSON.stringify(taskSubmissions));
-      renderAssignments();
-      updateDashboardTaskStats();
-      if (currentUser.role === 'guru') {
-        renderTeacherSubmissions();
-      }
+      saveToFirebase('taskSubmissions', taskSubmissions);
       closeUploadModal();
-      showToast("Tugas dikirim!", "success");
+      showToast("Tugas dikirim ke server Realtime!", "success");
     }
 
     function renderStudentTable() {
@@ -2619,25 +2613,21 @@
         accounts[index].grade = grade;
         showToast("Data siswa diperbarui!", "success");
       }
-      localStorage.setItem('inf12_accounts', JSON.stringify(accounts));
+      saveToFirebase('accounts', accounts);
       closeStudentModal();
-      renderStudentTable();
-      renderTeacherLeaderboard();
     }
 
     function resetStudentPassword(index) {
       accounts[index].pass = "siswa123";
-      localStorage.setItem('inf12_accounts', JSON.stringify(accounts));
+      saveToFirebase('accounts', accounts);
       showToast(`Password ${accounts[index].name} di-reset ke 'siswa123'`, "info");
     }
 
     function deleteStudent(index) {
       const studentName = accounts[index].name;
       accounts.splice(index, 1);
-      localStorage.setItem('inf12_accounts', JSON.stringify(accounts));
+      saveToFirebase('accounts', accounts);
       showToast(`Siswa ${studentName} dihapus.`, "warning");
-      renderStudentTable();
-      renderTeacherLeaderboard();
     }
 
     function closeStudentModal() {
@@ -2806,20 +2796,8 @@
         quizQuestions: []
       };
       courseModules.push(newModule);
-      
-      try {
-        localStorage.setItem('inf12_modules', JSON.stringify(courseModules));
-        showToast(`Modul baru ditambahkan!`, "success");
-      } catch (err) {
-        courseModules.pop();
-        showToast("Ukuran file melebihi batas browser!", "error");
-        return;
-      }
-      
-      renderModules();
-      renderManageModulesList();
-      populateModuleDropdown();
-      populateLeaderboardFilter();
+      saveToFirebase('modules', courseModules);
+      showToast(`Modul baru berhasil ditambahkan!`, "success");
       
       e.target.reset();
       uploadedFileContent = "";
@@ -2855,11 +2833,7 @@
         courseModules[modIndex].icon = document.getElementById('edit-mod-icon').value.trim();
         courseModules[modIndex].desc = document.getElementById('edit-mod-desc').value.trim();
         courseModules[modIndex].content = document.getElementById('edit-mod-content').value.trim();
-        localStorage.setItem('inf12_modules', JSON.stringify(courseModules));
-        renderModules();
-        renderManageModulesList();
-        populateModuleDropdown();
-        populateLeaderboardFilter();
+        saveToFirebase('modules', courseModules);
         closeEditModuleModal();
         showToast("Modul diperbarui!", "success");
       }
@@ -2869,16 +2843,14 @@
       const targetMod = courseModules.find(m => m.id === modId);
       if (!targetMod) return;
       courseModules = courseModules.filter(m => m.id !== modId);
-      localStorage.setItem('inf12_modules', JSON.stringify(courseModules));
-      renderModules();
-      renderManageModulesList();
-      populateModuleDropdown();
-      populateLeaderboardFilter();
+      saveToFirebase('modules', courseModules);
       showToast(`Modul "${targetMod.title}" dihapus!`, "warning");
     }
 
     function loadExistingQuizForModule() {
-      const modId = document.getElementById('quiz-target-module').value;
+      const selectEl = document.getElementById('quiz-target-module');
+      if (!selectEl) return;
+      const modId = selectEl.value;
       const container = document.getElementById('quiz-questions-builder-container');
       if (!container) return;
       container.innerHTML = "";
@@ -2894,6 +2866,7 @@
 
     function addQuizQuestionItem(data = null) {
       const container = document.getElementById('quiz-questions-builder-container');
+      if (!container) return;
       const itemIndex = container.children.length;
       const qText = data ? data.question : "";
       const optA = data && data.options ? data.options[0] : "";
@@ -2991,14 +2964,14 @@
       const targetMod = courseModules.find(m => m.id === modId);
       if (targetMod) {
         targetMod.quizQuestions = newQuestions;
-        localStorage.setItem('inf12_modules', JSON.stringify(courseModules));
-        renderModules();
+        saveToFirebase('modules', courseModules);
         showToast(`Berhasil menyimpan ${newQuestions.length} soal kuis!`, "success");
       }
     }
 
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
+      if (!container) return;
       const toast = document.createElement('div');
       
       let bgColors = "bg-white dark:bg-slate-900 border-emerald-500/30 dark:border-slate-700 text-slate-800 dark:text-slate-100";
