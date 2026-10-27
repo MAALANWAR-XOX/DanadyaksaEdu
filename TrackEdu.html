@@ -1088,82 +1088,14 @@
     // Default Seed Data bila Database Kosong
     const DEFAULT_ACCOUNTS = [
       { name: "Muhammad Hilman Fasya, S.Pd.", id: "hilmanfasya90@gmail.com", pass: "Fasya1995", role: "guru", status: "Aktif", grade: "Kelas 12 (Dua Belas)", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Guru" },
-      { name: "Aira Farsya Anggreani Putri", id: "0109271505", pass: "siswa123", role: "siswa", status: "Aktif", grade: "Kelas 12 (Dua Belas)", avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Siswa" },
     ];
     const DEFAULT_MODULES = [
-      {
-        id: "mod-1",
-        title: "Pemrograman Berorientasi Objek (OOP)",
-        desc: "Memahami Encapsulation, Inheritance, Polymorphism, & Abstraction dalam pemrograman modern.",
-        badge: "Modul 1",
-        icon: "fa-cubes",
-        color: "emerald",
-        content: `
-          <h3 class="text-lg sm:text-xl font-bold text-emerald-700 dark:text-cyan-400 mb-2">1. Konsep Dasar OOP</h3>
-          <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
-            Pemrograman Berorientasi Objek (OOP) adalah paradigma berdasarkan konsep "objek", yang berisi data (field) dan fungsi (metode).
-          </p>
-          <ul class="list-disc pl-5 text-xs text-slate-700 dark:text-slate-300 space-y-2 mb-4">
-            <li><strong>Encapsulation:</strong> Menyembunyikan detail internal objek dan membatasi akses langsung.</li>
-            <li><strong>Inheritance:</strong> Mewarisi atribut dan metode dari kelas utama ke kelas turunan.</li>
-            <li><strong>Polymorphism:</strong> Kemampuan metode memiliki berbagai bentuk respons sesuai konteks.</li>
-          </ul>
-        `,
-        quizQuestions: [
-          {
-            question: "Prinsip OOP mana yang bertugas menyembunyikan detail implementasi internal?",
-            options: ["Inheritance", "Encapsulation", "Polymorphism", "Abstraction"],
-            correct: 1
-          },
-          {
-            question: "Manakah konsep OOP yang memungkinkan kelas anak mewarisi fungsi dari kelas induk?",
-            options: ["Encapsulation", "Polymorphism", "Inheritance", "Instantiation"],
-            correct: 2
-          }
-        ]
-      },
-      {
-        id: "mod-2",
-        title: "Desain Antarmuka & UX (UI/UX Design)",
-        desc: "Prinsip dasar Usability, Design Thinking, Wireframing, dan High-Fidelity Prototyping.",
-        badge: "Modul 2",
-        icon: "fa-pen-nib",
-        color: "teal",
-        content: `
-          <h3 class="text-lg sm:text-xl font-bold text-teal-700 dark:text-indigo-400 mb-2">1. Design Thinking & Prototyping</h3>
-          <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
-            UI (User Interface) berfokus pada estetika tampilan visual, sedangkan UX (User Experience) berfokus pada kenyamanan alur pengguna saat berinteraksi.
-          </p>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Tahapan Design Thinking: Empathize ➔ Define ➔ Ideate ➔ Prototype ➔ Test.</p>
-        `,
-        quizQuestions: [
-          {
-            question: "Tahapan paling awal dalam metode Design Thinking adalah...",
-            options: ["Ideate", "Prototype", "Empathize", "Define"],
-            correct: 2
-          }
-        ]
-      }
     ];
     const DEFAULT_ANNOUNCEMENTS = [
-      {
-        id: "ann-1",
-        category: "Project submission",
-        date: "18 Okt 2026",
-        title: "Pengumpulan Proyek UI/UX Aplikasi Edukasi",
-        desc: "Pastikan melampirkan link Figma dan prototype interaktif sebelum hari Jumat pkl 23.59 WIB."
-      }
     ];
     const DEFAULT_SCHEDULES = [
-      {
-        id: "sch-1",
-        time: "Senin, 08:00 WIB",
-        subject: "Object Oriented Programming (OOP)",
-        room: "Lab 1"
-      }
     ];
     const DEFAULT_ASSIGNMENTS = [
-      { id: "t1", title: "Proyek UI/UX Figma - Aplikasi Sekolah", due: "25 Oktober 2026" }
     ];
 
     // Global State
